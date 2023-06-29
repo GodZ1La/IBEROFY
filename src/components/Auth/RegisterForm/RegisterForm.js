@@ -6,7 +6,7 @@ import { initialValues, validationSchema } from "./RegisterForm.data";
 import "./RegisterForm.scss";
 
 // Importa los módulos necesarios para la autenticación de Google desde el SDK de Firebase
-import { getAuth, GoogleAuthProvider } from "firebase/auth";
+import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 
 const auth = new Auth();
 const googleProvider = new GoogleAuthProvider();
@@ -33,12 +33,17 @@ export function RegisterForm(props) {
   const signInWithGoogle = async () => {
     const authInstance = getAuth(); // Obtiene la instancia de autenticación de Firebase
 
-    try {
-      // Inicia sesión con el proveedor de Google
-      await authInstance.signInWithPopup(googleProvider);
-    } catch (error) {
-      console.error(error);
-    }
+    signInWithPopup(authInstance, googleProvider)
+        .then((result) => {
+            const credential = GoogleAuthProvider.credentialFromResult(result);
+            const token = credential.accessToken;
+            const user = result.user;
+            console.log(user)
+        }).catch((error) => {
+          // Handle Errors here.
+          const errorCode = error.code;
+          const errorMessage = error.message;
+        });
   };
 
   return (
